@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Your Journal/Notes",
   description: "Create and manage your journal/notes",
+  icons:{
+    icon:"/favicon.ico"
+  }
 };
 
 export default function RootLayout({
