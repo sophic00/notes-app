@@ -1,5 +1,7 @@
-// components/NoteCard.tsx
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+import remarkGfm from 'remark-gfm';
 
 interface NoteCardProps {
   title: string;
@@ -29,14 +31,18 @@ export default function NoteCard({
         <p className="text-gray-700 font-medium text-sm">{description}</p>
       </div>
 
-      {/* Content */}
       <div className="px-4 py-3">
         <div 
-          className={`text-gray-600 text-sm break-words whitespace-pre-wrap overflow-y-auto transition-all duration-300 ${
+          className={`prose prose-sm max-w-none text-gray-600 break-words overflow-y-auto transition-all duration-300 ${
             expanded ? "h-auto max-h-64" : "h-16"
           }`}
         >
-          {content}
+          <ReactMarkdown 
+            rehypePlugins={[rehypeRaw]} 
+            remarkPlugins={[remarkGfm]}
+          >
+            {content}
+          </ReactMarkdown>
         </div>
         {content.length > 100 && !expanded && (
           <div className="h-6 bg-gradient-to-t from-white to-transparent w-full"></div>
