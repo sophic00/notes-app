@@ -6,6 +6,9 @@ export default function View() {
   const [notes, setNotes] = useState<
     { title: string; description: string; content: string; date: string }[]
   >([]);
+  const [expandedNote, setExpandedNote] = useState<
+    { title: string; description: string; content: string; date: string } | null
+  >(null);
 
   useEffect(() => {
     const storedNotes = localStorage.getItem("notes");
@@ -30,7 +33,28 @@ export default function View() {
           </p>
         </div>
 
-        {notes.length > 0 ? (
+        {expandedNote ? (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center p-4 overflow-hidden">
+            <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full h-[90vh] flex flex-col relative">
+              <button 
+                onClick={() => setExpandedNote(null)}
+                className="absolute top-3 right-3 z-50 bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
+                aria-label="Close note"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <NoteCard
+                title={expandedNote.title}
+                description={expandedNote.description}
+                content={expandedNote.content}
+                date={expandedNote.date}
+                fullscreen={true}
+              />
+            </div>
+          </div>
+        ) : notes.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {notes.map((note, index) => (
               <div key={index} className="h-full">
@@ -39,6 +63,7 @@ export default function View() {
                   description={note.description}
                   content={note.content}
                   date={note.date}
+                  onClick={() => setExpandedNote(note)} // Expand the clicked note
                 />
               </div>
             ))}

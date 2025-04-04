@@ -8,6 +8,8 @@ interface NoteCardProps {
   description: string;
   content: string;
   date: string;
+  onClick?: () => void;
+  fullscreen?: boolean;
 }
 
 export default function NoteCard({
@@ -15,46 +17,61 @@ export default function NoteCard({
   description,
   content,
   date,
+  onClick,
+  fullscreen = false,
 }: NoteCardProps) {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="h-full bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow duration-300">
+    <div 
+      className={`${
+        fullscreen
+          ? "flex flex-col h-full overflow-hidden"
+          : "h-full bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+      }`}
+      onClick={!fullscreen ? onClick : undefined}
+    >
       {/* Title */}
-      <div className="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-4 py-3 relative overflow-hidden">
+      <div className={`bg-gradient-to-r from-blue-500 to-blue-700 text-white px-5 py-4 relative overflow-hidden flex-shrink-0 ${fullscreen ? "border-b border-blue-800" : ""}`}>
         <div className="absolute top-0 right-0 w-20 h-20 bg-white opacity-10 rounded-full -mr-10 -mt-10"></div>
-        <h2 className="text-lg font-semibold truncate relative z-10">{title}</h2>
+        <h2 className={`${fullscreen ? "text-2xl" : "text-lg"} font-semibold truncate relative z-10`}>{title}</h2>
       </div>
 
       {/* Description */}
-      <div className="px-4 py-3 border-b border-gray-100">
-        <p className="text-gray-700 font-medium text-sm">{description}</p>
+      <div className={`px-5 py-3 border-b border-gray-100 ${fullscreen ? "bg-blue-50" : ""} flex-shrink-0`}>
+        <p className="text-gray-700 font-medium">{description}</p>
       </div>
 
-      <div className="px-4 py-3">
-        <div 
-          className={`prose prose-sm max-w-none text-gray-600 break-words overflow-y-auto transition-all duration-300 ${
-            expanded ? "h-auto max-h-64" : "h-16"
-          }`}
-        >
-          <ReactMarkdown 
-            rehypePlugins={[rehypeRaw]} 
-            remarkPlugins={[remarkGfm]}
+      {/* Content - This is what needs to scroll */}
+      <div className={`${fullscreen ? "flex-grow overflow-y-auto" : ""}`}>
+        <div className={`${fullscreen ? "px-5 py-4" : "px-4 py-3"}`}>
+          <div 
+            className={`prose ${fullscreen ? "prose-lg" : "prose-sm"} max-w-none text-gray-600 break-words ${
+              !fullscreen && (expanded ? "h-auto max-h-64" : "h-16 overflow-hidden")
+            }`}
           >
-            {content}
-          </ReactMarkdown>
+            <ReactMarkdown 
+              rehypePlugins={[rehypeRaw]} 
+              remarkPlugins={[remarkGfm]}
+            >
+              {content}
+            </ReactMarkdown>
+          </div>
+          {!fullscreen && content.length > 100 && !expanded && (
+            <div className="h-6 bg-gradient-to-t from-white to-transparent w-full"></div>
+          )}
         </div>
-        {content.length > 100 && !expanded && (
-          <div className="h-6 bg-gradient-to-t from-white to-transparent w-full"></div>
-        )}
       </div>
 
       {/* Footer with Date and Expand button */}
-      <div className="px-4 py-3 bg-gray-50 flex items-center justify-between mt-auto">
+      <div className={`px-5 py-3 ${fullscreen ? "bg-gray-100 border-t border-gray-200" : "bg-gray-50"} flex items-center justify-between flex-shrink-0`}>
         <span className="text-xs text-gray-500">{date}</span>
-        {content.length > 100 && (
+        {!fullscreen && content.length > 100 && (
           <button 
-            onClick={() => setExpanded(!expanded)} 
+            onClick={(e) => {
+              e.stopPropagation();
+              setExpanded(!expanded);
+            }} 
             className="text-blue-500 hover:text-blue-700 text-xs font-medium transition-colors flex items-center"
           >
             {expanded ? "Show Less" : "Show More"}
