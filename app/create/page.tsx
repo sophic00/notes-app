@@ -1,6 +1,12 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+
+const MDEditor = dynamic(
+  () => import("@uiw/react-md-editor").then((mod) => mod.default),
+  { ssr: false }
+);
 
 export default function Create() {
   const [title, setTitle] = useState("");
@@ -69,15 +75,19 @@ export default function Create() {
             </div>
             
             <div className="space-y-2">
-              <label htmlFor="content" className="text-lg font-medium text-gray-700">Content</label>
-              <textarea
-                id="content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Write your note content here..."
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all min-h-[150px]"
-                required
-              ></textarea>
+              <label htmlFor="markdown-editor" className="text-lg font-medium text-gray-700">
+                Content <span className="text-sm text-gray-500">(Supports Markdown)</span>
+              </label>
+              <div data-color-mode="light">
+                <MDEditor
+                  id="markdown-editor"
+                  value={content}
+                  onChange={(value) => setContent(value || "")}
+                  height={400}
+                  preview="live"
+                  visibleDragbar={true}
+                />
+              </div>
             </div>
             
             <div className="space-y-2">
